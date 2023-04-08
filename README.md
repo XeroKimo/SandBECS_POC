@@ -11,7 +11,6 @@ This is library is experimental, if it's not part of my immediate goals, they ar
 I dislike multi-stage init, at least if it was part of the same class. Multi-stage makes an inidividual class much harder to reason, which makes it in my opinion harder to change, and more error prone to use. Multi-stage should be represented by another type such as using std::optional
 
 ## Clear ownership and lifetimes
-This goes hand in hand with avoiding multi-stage init / de-init. To avoid multi-stage de-init, we need to have a good understanding of lifetimes, which is indirectly
 
 # Usage
 There are 3 main classes:
