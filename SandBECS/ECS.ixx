@@ -392,13 +392,21 @@ namespace SandBECS
 		SharedPtr<Ty> CreateGameObject(Params&&... params)
 		{
 			SharedPtr<Ty> gameObject = MakeShared<Ty>(*this, std::forward<Params>(params)...);
-			OnGameObjectCreated(gameObject, typeid(*gameObject));
+			OnGameObjectCreated(gameObject, typeid(Ty));
 			return gameObject;
 		}
-		virtual void OnComponentCreated(const TempOwner<Component> component, const std::type_info& type) = 0;
+
+		template<std::derived_from<Component> Ty, class... Params>
+		Owner<Ty> CreateComponent(GameObject& gameObject, Params&&... params)
+		{
+			Owner<Ty> component = MakeShared<Ty>(gameObject, std::forward<Params>(params)...);
+			OnComponentCreated(component, typeid(Ty));
+			return component;
+		}
 
 	protected:
 		virtual void OnGameObjectCreated(const SharedPtr<GameObject> gameObject, const std::type_info& type) = 0;
+		virtual void OnComponentCreated(const TempOwner<Component> component, const std::type_info& type) = 0;
 	};
 
 	SharedPtr<GameObject> Component::GetOwner() noexcept
@@ -445,9 +453,7 @@ namespace SandBECS
 	template<std::derived_from<Component> Ty, class ...Params>
 	Owner<Ty> GameObject::CreateComponent(Params && ...params)
 	{
-		Owner<Ty> component = MakeShared<Ty>(*this, std::forward<Params>(params)...);
-		m_container->OnComponentCreated(component, typeid(*component.Get()));
-		return component;
+		return m_container->CreateComponent<Ty>(*this, std::forward<Params>(params)...);
 	}
 
 	template<class Ty1, class Ty2>
